@@ -1,0 +1,85 @@
+<!doctype html><html lang=en-us><head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<title>Getting Started | Network Guard Proxy</title>
+<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,segoe ui,Roboto,sans-serif;line-height:1.7;color:#333}.container{max-width:960px;margin:0 auto;padding:0 1.5rem}header{background:#1a1a2e;color:#fff;padding:1rem 0}header .container{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}header h1{font-size:1.3rem}header h1 a{color:#fff;text-decoration:none}nav a{color:#ccc;text-decoration:none;margin-left:1.2rem;font-size:.9rem}nav a:hover{color:#fff}main{padding:2rem 0;min-height:60vh}h1{margin-bottom:1rem;color:#1a1a2e}h2{margin:1.5rem 0 .75rem;color:#16213e}h3{margin:1.2rem 0 .5rem}p{margin-bottom:.8rem}ul,ol{margin:.5rem 0 1rem 1.5rem}li{margin-bottom:.3rem}code{background:#f4f4f4;padding:.15rem .4rem;border-radius:3px;font-size:.9em}pre{background:#f4f4f4;padding:1rem;border-radius:6px;overflow-x:auto;margin:1rem 0}pre code{background:0 0;padding:0}table{border-collapse:collapse;width:100%;margin:1rem 0}th,td{border:1px solid #ddd;padding:.5rem .75rem;text-align:left}th{background:#f8f9fa}footer{border-top:1px solid #eee;padding:1.5rem 0;text-align:center;color:#888;font-size:.85rem;margin-top:2rem}</style>
+</head>
+<body><header>
+<div class=container>
+<h1><a href=https://networkguard.github.io/proxy/>Network Guard Proxy</a></h1>
+<nav>
+<a href=/proxy/>Home</a>
+<a href=/proxy/architecture/>Architecture</a>
+<a href=/proxy/getting-started/>Getting Started</a>
+<a href=/proxy/configuration/>Configuration</a>
+<a href=/proxy/api-reference/>API Reference</a>
+<a href=/proxy/rule-system/>Rule System</a>
+<a href=/proxy/web-ui/>Web UI</a>
+</nav>
+</div>
+</header>
+<main>
+<div class=container>
+<h1>Getting Started</h1>
+<h2 id=prerequisites>Prerequisites</h2>
+<ul>
+<li>Go 1.24 or later</li>
+</ul>
+<h2 id=installation>Installation</h2>
+<p>Clone the repository and build:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash>git clone https://github.com/networkguard/proxy.git
+cd proxy
+go build ./cmd/networkguard/
+</code></pre></div><h2 id=configuration>Configuration</h2>
+<p>Copy the example configuration:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash>cp config.example.yaml config.yaml
+</code></pre></div><p>Edit <code>config.yaml</code> to set your upstream backend URL:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=color:#f92672>proxy</span>:
+  <span style=color:#f92672>listen_address</span>: <span style=color:#e6db74>&#34;:8080&#34;</span>
+  <span style=color:#f92672>upstream_url</span>: <span style=color:#e6db74>&#34;http://localhost:9000&#34;</span>
+<span style=color:#f92672>admin</span>:
+  <span style=color:#f92672>listen_address</span>: <span style=color:#e6db74>&#34;:9090&#34;</span>
+<span style=color:#f92672>storage</span>:
+  <span style=color:#f92672>driver</span>: <span style=color:#e6db74>&#34;sqlite&#34;</span>
+  <span style=color:#f92672>dsn</span>: <span style=color:#e6db74>&#34;./network_guard.db&#34;</span>
+<span style=color:#f92672>logging</span>:
+  <span style=color:#f92672>level</span>: <span style=color:#e6db74>&#34;info&#34;</span>
+  <span style=color:#f92672>max_logs</span>: <span style=color:#ae81ff>10000</span>
+</code></pre></div><h2 id=running>Running</h2>
+<p>Start the proxy:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash>./networkguard --config config.yaml
+</code></pre></div><p>The proxy will listen on two ports:</p>
+<ul>
+<li><strong>:8080</strong> - Public proxy port (client traffic)</li>
+<li><strong>:9090</strong> - Admin port (API + Web UI)</li>
+</ul>
+<h2 id=quick-test>Quick Test</h2>
+<p>You can set up a simple upstream server for testing:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash>python3 -m http.server <span style=color:#ae81ff>9000</span> &amp;
+./networkguard --config config.yaml
+</code></pre></div><p>Then access the Web UI at <code>http://localhost:9090</code> and send requests through the proxy at <code>http://localhost:8080</code>.</p>
+<h2 id=creating-your-first-rule>Creating Your First Rule</h2>
+<p>Use the API to create a rule that blocks access to <code>/admin</code> paths:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash>curl -X POST http://localhost:9090/api/v1/rules <span style=color:#ae81ff>\
+</span><span style=color:#ae81ff></span>  -H <span style=color:#e6db74>&#34;Content-Type: application/json&#34;</span> <span style=color:#ae81ff>\
+</span><span style=color:#ae81ff></span>  -d <span style=color:#e6db74>&#39;{
+</span><span style=color:#e6db74>    &#34;priority&#34;: 1,
+</span><span style=color:#e6db74>    &#34;action&#34;: &#34;deny&#34;,
+</span><span style=color:#e6db74>    &#34;enabled&#34;: true,
+</span><span style=color:#e6db74>    &#34;description&#34;: &#34;Block admin paths&#34;,
+</span><span style=color:#e6db74>    &#34;match&#34;: {
+</span><span style=color:#e6db74>      &#34;path_prefixes&#34;: [&#34;/admin&#34;]
+</span><span style=color:#e6db74>    }
+</span><span style=color:#e6db74>  }&#39;</span>
+</code></pre></div><p>Test the rule:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash>curl -i http://localhost:8080/admin/secret
+<span style=color:#75715e># Returns 403 Forbidden</span>
+</code></pre></div>
+</div>
+</main><footer>
+<div class=container>
+<p>Network Guard Proxy Documentation</p>
+</div>
+</footer>
+</body>
+</html>

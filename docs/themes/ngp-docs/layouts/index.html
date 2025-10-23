@@ -1,0 +1,21 @@
+{{ define "main" }}
+<h1>Network Guard Proxy</h1>
+<p>A lightweight reverse proxy and application-level firewall written in Go.</p>
+
+<h2>Features</h2>
+<ul>
+    <li>Configurable security rules with IP CIDR, path, method, and header matching</li>
+    <li>Priority-based rule evaluation with first-match-wins semantics</li>
+    <li>REST API for rule and log management</li>
+    <li>Web UI dashboard for monitoring and configuration</li>
+    <li>SQLite persistence for rules and request logs</li>
+    <li>Graceful shutdown and clean architecture</li>
+</ul>
+
+<h2>Quick Start</h2>
+<pre><code>go build ./cmd/networkguard/
+cp config.example.yaml config.yaml
+./networkguard --config config.yaml</code></pre>
+
+<p>Visit <a href="/getting-started/">Getting Started</a> for full setup instructions.</p>
+{{ end }}

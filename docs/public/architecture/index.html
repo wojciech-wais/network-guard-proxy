@@ -1,0 +1,64 @@
+<!doctype html><html lang=en-us><head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<title>Architecture | Network Guard Proxy</title>
+<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,segoe ui,Roboto,sans-serif;line-height:1.7;color:#333}.container{max-width:960px;margin:0 auto;padding:0 1.5rem}header{background:#1a1a2e;color:#fff;padding:1rem 0}header .container{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}header h1{font-size:1.3rem}header h1 a{color:#fff;text-decoration:none}nav a{color:#ccc;text-decoration:none;margin-left:1.2rem;font-size:.9rem}nav a:hover{color:#fff}main{padding:2rem 0;min-height:60vh}h1{margin-bottom:1rem;color:#1a1a2e}h2{margin:1.5rem 0 .75rem;color:#16213e}h3{margin:1.2rem 0 .5rem}p{margin-bottom:.8rem}ul,ol{margin:.5rem 0 1rem 1.5rem}li{margin-bottom:.3rem}code{background:#f4f4f4;padding:.15rem .4rem;border-radius:3px;font-size:.9em}pre{background:#f4f4f4;padding:1rem;border-radius:6px;overflow-x:auto;margin:1rem 0}pre code{background:0 0;padding:0}table{border-collapse:collapse;width:100%;margin:1rem 0}th,td{border:1px solid #ddd;padding:.5rem .75rem;text-align:left}th{background:#f8f9fa}footer{border-top:1px solid #eee;padding:1.5rem 0;text-align:center;color:#888;font-size:.85rem;margin-top:2rem}</style>
+</head>
+<body><header>
+<div class=container>
+<h1><a href=https://networkguard.github.io/proxy/>Network Guard Proxy</a></h1>
+<nav>
+<a href=/proxy/>Home</a>
+<a href=/proxy/architecture/>Architecture</a>
+<a href=/proxy/getting-started/>Getting Started</a>
+<a href=/proxy/configuration/>Configuration</a>
+<a href=/proxy/api-reference/>API Reference</a>
+<a href=/proxy/rule-system/>Rule System</a>
+<a href=/proxy/web-ui/>Web UI</a>
+</nav>
+</div>
+</header>
+<main>
+<div class=container>
+<h1>Architecture</h1>
+<h2 id=system-components>System Components</h2>
+<p>Network Guard Proxy consists of four main components:</p>
+<h3 id=1-proxy-engine>1. Proxy Engine</h3>
+<p>The proxy engine listens on the public port (default <code>:8080</code>) and handles all incoming HTTP requests. For each request it:</p>
+<ol>
+<li>Builds a request context (client IP, method, path, headers)</li>
+<li>Evaluates the filter chain against configured rules</li>
+<li>Either blocks the request (403 Forbidden) or forwards it to the upstream backend</li>
+<li>Logs the decision with latency information</li>
+</ol>
+<p>The engine is built on Go&rsquo;s <code>net/http/httputil.ReverseProxy</code>.</p>
+<h3 id=2-control-api>2. Control API</h3>
+<p>A REST API running on the admin port (default <code>:9090</code>) provides CRUD operations for rules and query access to request logs. All endpoints return JSON.</p>
+<h3 id=3-web-ui>3. Web UI</h3>
+<p>A vanilla JavaScript single-page application served as static files from the admin port. It provides a dashboard, rule management, and log viewing interface.</p>
+<h3 id=4-storage-layer>4. Storage Layer</h3>
+<p>An abstracted storage interface backed by SQLite (using <code>modernc.org/sqlite</code>, a pure-Go implementation requiring no CGO). Stores rules and request logs with automatic pruning.</p>
+<h2 id=package-structure>Package Structure</h2>
+<pre tabindex=0><code>cmd/networkguard/main.go    - CLI entry point, server lifecycle
+internal/
+  config/config.go          - YAML configuration loading
+  models/rule.go            - Rule data model
+  models/log.go             - Log entry data model
+  storage/storage.go        - Storage interface
+  storage/sqlite.go         - SQLite implementation
+  proxy/proxy.go            - Reverse proxy engine
+  proxy/filter.go           - Rule matching / filter chain
+  api/api.go                - REST API handlers
+web/                        - Static UI assets
+</code></pre><h2 id=request-flow>Request Flow</h2>
+<pre tabindex=0><code>Client -&gt; :8080 -&gt; Filter Chain -&gt; [DENY] -&gt; 403 JSON response
+                                -&gt; [ALLOW] -&gt; Upstream Backend -&gt; Response to Client
+</code></pre><p>Every request is logged with its decision, matched rule ID, and latency.</p>
+</div>
+</main><footer>
+<div class=container>
+<p>Network Guard Proxy Documentation</p>
+</div>
+</footer>
+</body>
+</html>

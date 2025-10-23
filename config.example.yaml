@@ -1,0 +1,14 @@
+proxy:
+  listen_address: ":8080"
+  upstream_url: "http://localhost:9000"
+
+admin:
+  listen_address: ":9090"
+
+storage:
+  driver: "sqlite"
+  dsn: "./network_guard.db"
+
+logging:
+  level: "info"
+  max_logs: 10000

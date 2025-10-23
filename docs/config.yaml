@@ -1,0 +1,32 @@
+baseURL: https://networkguard.github.io/proxy/
+languageCode: en-us
+title: Network Guard Proxy
+theme: ngp-docs
+publishDir: public
+
+params:
+  description: Lightweight reverse proxy and application-level firewall written in Go
+
+menu:
+  main:
+    - name: Home
+      url: /
+      weight: 1
+    - name: Architecture
+      url: /architecture/
+      weight: 2
+    - name: Getting Started
+      url: /getting-started/
+      weight: 3
+    - name: Configuration
+      url: /configuration/
+      weight: 4
+    - name: API Reference
+      url: /api-reference/
+      weight: 5
+    - name: Rule System
+      url: /rule-system/
+      weight: 6
+    - name: Web UI
+      url: /web-ui/
+      weight: 7

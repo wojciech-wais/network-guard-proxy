@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Guard Proxy</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Network Guard Proxy</h1>
+        <nav>
+            <button class="nav-btn active" data-view="dashboard">Dashboard</button>
+            <button class="nav-btn" data-view="rules">Rules</button>
+            <button class="nav-btn" data-view="logs">Logs</button>
+        </nav>
+    </header>
+
+    <main>
+        <section id="dashboard-view" class="view active">
+            <h2>Dashboard</h2>
+            <div class="status-cards">
+                <div class="card">
+                    <h3>Version</h3>
+                    <p id="status-version">-</p>
+                </div>
+                <div class="card">
+                    <h3>Uptime</h3>
+                    <p id="status-uptime">-</p>
+                </div>
+                <div class="card">
+                    <h3>Total Rules</h3>
+                    <p id="status-rules-total">-</p>
+                </div>
+                <div class="card">
+                    <h3>Enabled Rules</h3>
+                    <p id="status-rules-enabled">-</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="rules-view" class="view">
+            <h2>Rules</h2>
+            <button id="add-rule-btn" class="btn btn-primary">Add Rule</button>
+            <table id="rules-table">
+                <thead>
+                    <tr>
+                        <th>Priority</th>
+                        <th>Action</th>
+                        <th>Description</th>
+                        <th>Match</th>
+                        <th>Enabled</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="rules-tbody"></tbody>
+            </table>
+        </section>
+
+        <section id="logs-view" class="view">
+            <h2>Logs</h2>
+            <div class="log-filters">
+                <select id="log-decision-filter">
+                    <option value="">All Decisions</option>
+                    <option value="allow">Allow</option>
+                    <option value="deny">Deny</option>
+                </select>
+                <input type="text" id="log-path-filter" placeholder="Filter by path...">
+                <label><input type="checkbox" id="log-auto-refresh" checked> Auto-refresh</label>
+            </div>
+            <table id="logs-table">
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>IP</th>
+                        <th>Method</th>
+                        <th>Path</th>
+                        <th>Status</th>
+                        <th>Decision</th>
+                        <th>Rule ID</th>
+                    </tr>
+                </thead>
+                <tbody id="logs-tbody"></tbody>
+            </table>
+        </section>
+    </main>
+
+    <!-- Rule Modal -->
+    <div id="rule-modal" class="modal" style="display:none">
+        <div class="modal-content">
+            <h3 id="modal-title">Add Rule</h3>
+            <form id="rule-form">
+                <input type="hidden" id="rule-id">
+                <label>Priority <input type="number" id="rule-priority" value="0" required></label>
+                <label>Action
+                    <select id="rule-action" required>
+                        <option value="deny">Deny</option>
+                        <option value="allow">Allow</option>
+                    </select>
+                </label>
+                <label>Description <input type="text" id="rule-description"></label>
+                <label>Enabled <input type="checkbox" id="rule-enabled" checked></label>
+                <fieldset>
+                    <legend>Match Conditions</legend>
+                    <label>IP CIDRs (comma-separated) <input type="text" id="rule-ip-cidr" placeholder="192.168.0.0/24, 10.0.0.0/8"></label>
+                    <label>Methods (comma-separated) <input type="text" id="rule-methods" placeholder="GET, POST"></label>
+                    <label>Path Prefixes (comma-separated) <input type="text" id="rule-path-prefixes" placeholder="/admin, /api/private"></label>
+                    <label>Exact Paths (comma-separated) <input type="text" id="rule-exact-paths" placeholder="/health, /ready"></label>
+                    <label>Header Equals (key:value, comma-separated) <input type="text" id="rule-header-equals" placeholder="X-Custom:value"></label>
+                    <label>Header Contains (key:substring, comma-separated) <input type="text" id="rule-header-contains" placeholder="User-Agent:sqlmap"></label>
+                </fieldset>
+                <div class="modal-actions">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn" id="cancel-modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

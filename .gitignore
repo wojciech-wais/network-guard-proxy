@@ -1,0 +1,4 @@
+network_guard.db
+*.db
+/networkguard
+/cmd/networkguard/networkguard

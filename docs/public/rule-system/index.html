@@ -1,0 +1,97 @@
+<!doctype html><html lang=en-us><head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<title>Rule System | Network Guard Proxy</title>
+<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,segoe ui,Roboto,sans-serif;line-height:1.7;color:#333}.container{max-width:960px;margin:0 auto;padding:0 1.5rem}header{background:#1a1a2e;color:#fff;padding:1rem 0}header .container{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}header h1{font-size:1.3rem}header h1 a{color:#fff;text-decoration:none}nav a{color:#ccc;text-decoration:none;margin-left:1.2rem;font-size:.9rem}nav a:hover{color:#fff}main{padding:2rem 0;min-height:60vh}h1{margin-bottom:1rem;color:#1a1a2e}h2{margin:1.5rem 0 .75rem;color:#16213e}h3{margin:1.2rem 0 .5rem}p{margin-bottom:.8rem}ul,ol{margin:.5rem 0 1rem 1.5rem}li{margin-bottom:.3rem}code{background:#f4f4f4;padding:.15rem .4rem;border-radius:3px;font-size:.9em}pre{background:#f4f4f4;padding:1rem;border-radius:6px;overflow-x:auto;margin:1rem 0}pre code{background:0 0;padding:0}table{border-collapse:collapse;width:100%;margin:1rem 0}th,td{border:1px solid #ddd;padding:.5rem .75rem;text-align:left}th{background:#f8f9fa}footer{border-top:1px solid #eee;padding:1.5rem 0;text-align:center;color:#888;font-size:.85rem;margin-top:2rem}</style>
+</head>
+<body><header>
+<div class=container>
+<h1><a href=https://networkguard.github.io/proxy/>Network Guard Proxy</a></h1>
+<nav>
+<a href=/proxy/>Home</a>
+<a href=/proxy/architecture/>Architecture</a>
+<a href=/proxy/getting-started/>Getting Started</a>
+<a href=/proxy/configuration/>Configuration</a>
+<a href=/proxy/api-reference/>API Reference</a>
+<a href=/proxy/rule-system/>Rule System</a>
+<a href=/proxy/web-ui/>Web UI</a>
+</nav>
+</div>
+</header>
+<main>
+<div class=container>
+<h1>Rule System</h1>
+<h2 id=overview>Overview</h2>
+<p>Network Guard Proxy uses a priority-based rule system. Rules are evaluated in ascending priority order (lower number = higher priority). The first matching rule decides the action. If no rule matches, the default action is <strong>allow</strong>.</p>
+<h2 id=rule-structure>Rule Structure</h2>
+<p>Each rule has:</p>
+<ul>
+<li><strong>priority</strong> (int): Evaluation order. Lower values are checked first.</li>
+<li><strong>action</strong> (<code>allow</code> or <code>deny</code>): What to do when the rule matches.</li>
+<li><strong>enabled</strong> (bool): Disabled rules are skipped during evaluation.</li>
+<li><strong>match</strong>: Conditions that must ALL be true for the rule to match.</li>
+</ul>
+<h2 id=match-conditions>Match Conditions</h2>
+<p>All conditions within a rule are combined with AND logic. If a condition field is empty/omitted, it matches everything.</p>
+<h3 id=ip-cidr-ip_cidr>IP CIDR (<code>ip_cidr</code>)</h3>
+<p>Match client IP against CIDR ranges.</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-json data-lang=json>{ <span style=color:#f92672>&#34;ip_cidr&#34;</span>: [<span style=color:#e6db74>&#34;10.0.0.0/8&#34;</span>, <span style=color:#e6db74>&#34;172.16.0.0/12&#34;</span>] }
+</code></pre></div><h3 id=http-methods-methods>HTTP Methods (<code>methods</code>)</h3>
+<p>Match request HTTP method (case-insensitive).</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-json data-lang=json>{ <span style=color:#f92672>&#34;methods&#34;</span>: [<span style=color:#e6db74>&#34;GET&#34;</span>, <span style=color:#e6db74>&#34;POST&#34;</span>] }
+</code></pre></div><h3 id=path-prefixes-path_prefixes>Path Prefixes (<code>path_prefixes</code>)</h3>
+<p>Match if the request path starts with any of the given prefixes.</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-json data-lang=json>{ <span style=color:#f92672>&#34;path_prefixes&#34;</span>: [<span style=color:#e6db74>&#34;/admin&#34;</span>, <span style=color:#e6db74>&#34;/api/private&#34;</span>] }
+</code></pre></div><h3 id=exact-paths-exact_paths>Exact Paths (<code>exact_paths</code>)</h3>
+<p>Match if the request path exactly equals one of the given paths.</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-json data-lang=json>{ <span style=color:#f92672>&#34;exact_paths&#34;</span>: [<span style=color:#e6db74>&#34;/health&#34;</span>, <span style=color:#e6db74>&#34;/ready&#34;</span>] }
+</code></pre></div><h3 id=header-equals-header_equals>Header Equals (<code>header_equals</code>)</h3>
+<p>Match if the specified headers have exact values (case-insensitive comparison).</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-json data-lang=json>{ <span style=color:#f92672>&#34;header_equals&#34;</span>: { <span style=color:#f92672>&#34;X-API-Key&#34;</span>: <span style=color:#e6db74>&#34;secret123&#34;</span> } }
+</code></pre></div><h3 id=header-contains-header_contains>Header Contains (<code>header_contains</code>)</h3>
+<p>Match if the specified headers contain the given substrings (case-insensitive).</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-json data-lang=json>{ <span style=color:#f92672>&#34;header_contains&#34;</span>: { <span style=color:#f92672>&#34;User-Agent&#34;</span>: <span style=color:#e6db74>&#34;sqlmap&#34;</span> } }
+</code></pre></div><h2 id=examples>Examples</h2>
+<h3 id=block-all-traffic-from-internal-network>Block all traffic from internal network</h3>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-json data-lang=json>{
+  <span style=color:#f92672>&#34;priority&#34;</span>: <span style=color:#ae81ff>1</span>,
+  <span style=color:#f92672>&#34;action&#34;</span>: <span style=color:#e6db74>&#34;deny&#34;</span>,
+  <span style=color:#f92672>&#34;enabled&#34;</span>: <span style=color:#66d9ef>true</span>,
+  <span style=color:#f92672>&#34;description&#34;</span>: <span style=color:#e6db74>&#34;Block internal IPs&#34;</span>,
+  <span style=color:#f92672>&#34;match&#34;</span>: { <span style=color:#f92672>&#34;ip_cidr&#34;</span>: [<span style=color:#e6db74>&#34;10.0.0.0/8&#34;</span>] }
+}
+</code></pre></div><h3 id=allow-only-get-and-post-deny-everything-else>Allow only GET and POST, deny everything else</h3>
+<p>Create two rules:</p>
+<ol>
+<li>Allow rule (priority 1):</li>
+</ol>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-json data-lang=json>{
+  <span style=color:#f92672>&#34;priority&#34;</span>: <span style=color:#ae81ff>1</span>,
+  <span style=color:#f92672>&#34;action&#34;</span>: <span style=color:#e6db74>&#34;allow&#34;</span>,
+  <span style=color:#f92672>&#34;match&#34;</span>: { <span style=color:#f92672>&#34;methods&#34;</span>: [<span style=color:#e6db74>&#34;GET&#34;</span>, <span style=color:#e6db74>&#34;POST&#34;</span>] }
+}
+</code></pre></div><ol start=2>
+<li>Deny-all rule (priority 2):</li>
+</ol>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-json data-lang=json>{
+  <span style=color:#f92672>&#34;priority&#34;</span>: <span style=color:#ae81ff>2</span>,
+  <span style=color:#f92672>&#34;action&#34;</span>: <span style=color:#e6db74>&#34;deny&#34;</span>,
+  <span style=color:#f92672>&#34;match&#34;</span>: {},
+  <span style=color:#f92672>&#34;description&#34;</span>: <span style=color:#e6db74>&#34;Deny all other methods&#34;</span>
+}
+</code></pre></div><h3 id=block-suspicious-user-agents>Block suspicious user agents</h3>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-json data-lang=json>{
+  <span style=color:#f92672>&#34;priority&#34;</span>: <span style=color:#ae81ff>5</span>,
+  <span style=color:#f92672>&#34;action&#34;</span>: <span style=color:#e6db74>&#34;deny&#34;</span>,
+  <span style=color:#f92672>&#34;description&#34;</span>: <span style=color:#e6db74>&#34;Block SQL injection tools&#34;</span>,
+  <span style=color:#f92672>&#34;match&#34;</span>: { <span style=color:#f92672>&#34;header_contains&#34;</span>: { <span style=color:#f92672>&#34;User-Agent&#34;</span>: <span style=color:#e6db74>&#34;sqlmap&#34;</span> } }
+}
+</code></pre></div>
+</div>
+</main><footer>
+<div class=container>
+<p>Network Guard Proxy Documentation</p>
+</div>
+</footer>
+</body>
+</html>
